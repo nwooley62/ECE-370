@@ -4,7 +4,10 @@ int IR = 10;
 int const num = 10;
 int readIndex = 0;
 float t1 = 0, t2 = 0, delta = 0;
-float times[num], total,average;
+float times[num], total, average, input = 0, output;
+int sign;
+float requested;
+float currentOffset = 1, curentVelocity = 127;
 
 void setup() {
 
@@ -23,11 +26,47 @@ void loop() {
 
   while(1){
     if(Serial.available()){
-      setVelocity(Serial.parseFloat());
+      currentOffset = 1;
+      requested = Serial.parseFloat();
+      Serial.println(requested);
+      set();
+      //setVelocity(Serial.parseFloat());
     }
+    check();
   }
 
 }
+
+void set(){
+  if(requested < 0) sign = -1;
+    else sign = 1;
+
+  if (requested > output)
+  {
+    //setVelocity(currentVelocity + (currentOffset));
+    setVelocity(254);
+  }
+  else if (requested < output)
+  {
+    //setVelocity(currentVelocity - (currentOffset));
+    setVelocity(0);
+  }
+}
+
+void check()
+{
+  if (abs(requested - output) > 0.005)
+  {
+    //currentOffset *= 1.01;
+    //if(currentOffset > 1.5) currentOffset = 1.5;
+    set();
+  }
+  else
+  {
+    currentOffset = 1;
+  }
+}
+
 
 void setVelocity(float velocity){
   
@@ -39,7 +78,7 @@ void setVelocity(float velocity){
     digitalWrite(pinB, LOW);
     analogWrite(pinA, (127-velocity)*2);
   }
-  Serial.print(velocity);
+  //Serial.print(velocity);
   return;
 }
 
@@ -51,11 +90,17 @@ void findSpeed(){
 
   total = total - times[readIndex];
   times[readIndex] = delta;
+  total = total + times[readIndex];
   readIndex++;
 
   if(readIndex >= num)
     readIndex = 0;
+    
   average = total/num;
-  Serial.println(average);
-  
+
+
+  input = 1000/ (4 * average);
+  output = input/75.81;
+
+  Serial.println(output);
 }
