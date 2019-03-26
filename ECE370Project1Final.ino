@@ -25,9 +25,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(IRA), getTick, CHANGE);
   currentAngle = 0;
   t1 = millis();
-//  for(int i = 0; i < 7; i++){
-//    incoming[i] = 0;
-//  }
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
@@ -39,7 +37,6 @@ while(true){
     }
   }
   if(incoming[0] == 255 && incoming[1] == 255){
-    //Serial.println("All clear first two bytes");
     sign = incoming[2];
     divSum = incoming[3] * 256;
     modSum = incoming[4];
@@ -60,11 +57,11 @@ while(true){
   currentAngle = getAngle(numTicksCounted);
   
   t1 = millis();
-  //if(t1 - t2 >= 20){
+  if(t1 - t2 >= 20){
     motor = pControl(requested, currentAngle) + 127;
     setVelocity(motor);
     t2 = t1;
-  //}
+  }
 }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +97,6 @@ void setVelocity(float velocity){                             //sets the velocit
 
 float getAngle(int count){
   angle = count * 1.2; //1.2 degrees per tick
-//  Serial.print("Angle: ");
-//  Serial.println(angle);
   return angle;
   
 }
